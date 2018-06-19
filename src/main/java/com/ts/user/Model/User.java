@@ -29,7 +29,8 @@ public class User {
 
     public void setDesignation(String designation) { this.designation = designation; }
 
-    public String setOffice() { return office; }
+    public String getOffice() { return office; }
 
-    public void getOffice(String office) { this.office = office; }
+    public void setOffice(String office) { this.office = office; }
+
 }
