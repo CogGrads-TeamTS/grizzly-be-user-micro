@@ -6,10 +6,13 @@ import com.ts.user.Model.User;
 import com.ts.user.Repository.UserRepository;
 import com.ts.user.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.swing.text.html.Option;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -19,10 +22,41 @@ public class UserController {
     private UserRepository userRepository;
 
     //TESTING PURPOSES
-    @GetMapping(value = "/user")
+    @GetMapping("/")
     Iterable<User> getAllUsers() {
-        // retrieves all categories from the category microservice using feign
-
         return userRepository.findAll();
     }
+
+    @GetMapping("/{id}")
+    public @ResponseBody ResponseEntity getUser(@PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+    }
+
+    @PostMapping(path = "/add", headers = "Content-Type=application/json")
+    public ResponseEntity addNewUser(@RequestBody User user) {
+
+        userRepository.save(user);
+
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity addNewUser(@RequestParam String name, @RequestParam String designation, @RequestParam String office) {
+
+        User user = new User();
+        user.setName(name);
+        user.setDesignation(designation);
+        user.setOffice(office);
+        userRepository.save(user);
+
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+
+    
 }
