@@ -58,5 +58,19 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
+    @PutMapping("/edit/{id}")
+    public ResponseEntity editUser(@PathVariable long id, @RequestBody User user) {
+
+        Optional<User> userOptional = userRepository.findById(id);
+        if (!userOptional.isPresent())
+            return ResponseEntity.notFound().build();
+
+        user.setId(id);
+
+        userRepository.save(user);
+
+        return new ResponseEntity("Updated User @{" + id + "} successfully", HttpStatus.OK);
+    }
+
     
 }
