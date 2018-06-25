@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ts</groupId>
-    <artifactId>user-service</artifactId>
+    <artifactId>applicationUser-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>user-service</name>
+    <name>applicationUser-service</name>
     <description>User microservice for Grizzly Store</description>
 
     <parent>
@@ -100,6 +100,32 @@
             <artifactId>spring-data-commons</artifactId>
             <version>2.0.7.RELEASE</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.auth0/auth0 -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>auth0</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.auth0/auth0-spring-security-api -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>auth0-spring-security-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -115,7 +141,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>user-service</finalName>
+        <finalName>applicationUser-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

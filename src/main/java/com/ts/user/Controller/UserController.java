@@ -1,17 +1,14 @@
 package com.ts.user.Controller;
 
 
-import com.netflix.discovery.converters.Auto;
-import com.ts.user.Model.User;
-import com.ts.user.Repository.UserRepository;
-import com.ts.user.Service.UserService;
+import com.ts.user.Model.ApplicationUser;
+import com.ts.user.Repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -19,17 +16,26 @@ import java.util.Optional;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private ApplicationUserRepository applicationUserRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @PostMapping("/sign-up")
+    public void signUp(@RequestBody ApplicationUser applicationUser) {
+        applicationUser.setPassword(bCryptPasswordEncoder.encode(applicationUser.getPassword()));
+        applicationUserRepository.save(applicationUser);
+    }
 
     //TESTING PURPOSES
     @GetMapping("/")
-    Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    Iterable<ApplicationUser> getAllUsers() {
+        return applicationUserRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public @ResponseBody ResponseEntity getUser(@PathVariable Long id) {
-        Optional<User> user = userRepository.findById(id);
+        Optional<ApplicationUser> user = applicationUserRepository.findById(id);
         if (!user.isPresent()) {
             return ResponseEntity.notFound().build();
         }
@@ -39,37 +45,37 @@ public class UserController {
     }
 
     @PostMapping(path = "/add", headers = "Content-Type=application/json")
-    public ResponseEntity addNewUser(@RequestBody User user) {
+    public ResponseEntity addNewUser(@RequestBody ApplicationUser applicationUser) {
 
-        userRepository.save(user);
+        applicationUserRepository.save(applicationUser);
 
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(applicationUser, HttpStatus.CREATED);
     }
 
     @PostMapping("/add")
     public ResponseEntity addNewUser(@RequestParam String name, @RequestParam String designation, @RequestParam String office) {
 
-        User user = new User();
-        user.setName(name);
-        user.setDesignation(designation);
-        user.setOffice(office);
-        userRepository.save(user);
+        ApplicationUser applicationUser = new ApplicationUser();
+//        applicationUser.setName(name);
+//        applicationUser.setDesignation(designation);
+//        applicationUser.setOffice(office);
+        applicationUserRepository.save(applicationUser);
 
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(applicationUser, HttpStatus.CREATED);
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity editUser(@PathVariable long id, @RequestBody User user) {
+    public ResponseEntity editUser(@PathVariable long id, @RequestBody ApplicationUser applicationUser) {
 
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<ApplicationUser> userOptional = applicationUserRepository.findById(id);
         if (!userOptional.isPresent())
             return ResponseEntity.notFound().build();
 
-        user.setId(id);
+        applicationUser.setId(id);
 
-        userRepository.save(user);
+        applicationUserRepository.save(applicationUser);
 
-        return new ResponseEntity("Updated User @{" + id + "} successfully", HttpStatus.OK);
+        return new ResponseEntity("Updated ApplicationUser @{" + id + "} successfully", HttpStatus.OK);
     }
 
     
