@@ -8,9 +8,6 @@ spring:
         enabled: true
         service-id: config-service
       uri: http://ts.ausgrads.academy:8765/config/
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
 
 
 

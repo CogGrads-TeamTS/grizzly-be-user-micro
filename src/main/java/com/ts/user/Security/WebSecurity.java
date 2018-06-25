@@ -19,7 +19,7 @@ import static com.ts.user.Security.SecurityConstants.SIGN_UP_URL;
 
 
 
-@EnableWebSecurity
+
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
