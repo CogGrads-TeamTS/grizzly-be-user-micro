@@ -1,15 +1,17 @@
 package com.ts.user.Controller;
 
-
 import com.ts.user.Model.ApplicationUser;
 import com.ts.user.Repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -30,13 +32,13 @@ public class UserController {
 
     //TESTING PURPOSES
     @GetMapping("/")
-    @PreAuthorize("hasAuthority('read:users')")
-    Iterable<ApplicationUser> getAllUsers() {
+    Iterable<ApplicationUser> getAllUsers(Principal principal) {
+        System.out.println(principal.getName());
         return applicationUserRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public @ResponseBody ResponseEntity getUser(@PathVariable Long id) {
+    public @ResponseBody ResponseEntity getUser(Principal principal, @PathVariable Long id) {
         Optional<ApplicationUser> user = applicationUserRepository.findById(id);
         if (!user.isPresent()) {
             return ResponseEntity.notFound().build();
