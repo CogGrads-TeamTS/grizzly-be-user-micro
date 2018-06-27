@@ -1,17 +1,31 @@
 package com.ts.user.Controller;
 
+
+import com.auth0.client.auth.AuthAPI;
+import com.auth0.client.mgmt.ManagementAPI;
+import com.auth0.exception.APIException;
+import com.auth0.exception.Auth0Exception;
+import com.auth0.json.auth.UserInfo;
+import com.auth0.json.mgmt.users.User;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.net.Request;
+import com.auth0.spring.security.api.authentication.AuthenticationJsonWebToken;
+import com.auth0.spring.security.api.authentication.JwtAuthentication;
 import com.ts.user.Model.ApplicationUser;
 import com.ts.user.Repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,19 +36,46 @@ public class UserController {
     private ApplicationUserRepository applicationUserRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private ManagementAPI managementAPI;
 
     @PostMapping("/sign-up")
     public void signUp(@RequestBody ApplicationUser applicationUser) {
-        applicationUser.setPassword(bCryptPasswordEncoder.encode(applicationUser.getPassword()));
         applicationUserRepository.save(applicationUser);
+    }
+
+    void checkUser(String username) {
+        // checks if user exists in database
+        // if user doesnt exist, fetches user info from Auth0 and creates user in database
+        ApplicationUser user = applicationUserRepository.findByUsername(username);
+        if (user == null) {
+            Request<User> userDetailsRequest = managementAPI.users().get(username, null);
+            try {
+                User userDetails = userDetailsRequest.execute();
+                ApplicationUser newUser = new ApplicationUser();
+                newUser.setUsername(username);
+                newUser.setName(userDetails.getName());
+                newUser.setEmail(userDetails.getEmail());
+                applicationUserRepository.save(newUser);
+            } catch (APIException exception) {
+                // api error
+            } catch (Auth0Exception exception) {
+                // request error
+            }
+        }
     }
 
     //TESTING PURPOSES
     @GetMapping("/")
-    Iterable<ApplicationUser> getAllUsers(Principal principal) {
+    ApplicationUser currentUser(Authentication auth, Principal principal) {
         System.out.println(principal.getName());
-        return applicationUserRepository.findAll();
+
+        DecodedJWT details = (DecodedJWT) auth.getDetails();
+
+        String accessToken = details.getToken();
+
+        checkUser(principal.getName());
+
+        return applicationUserRepository.findByUsername(principal.getName());
     }
 
     @GetMapping("/{id}")

@@ -101,7 +101,11 @@
             <version>2.0.7.RELEASE</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>auth0</artifactId>
+            <version>1.7.0</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.auth0/auth0-spring-security-api -->
         <dependency>
