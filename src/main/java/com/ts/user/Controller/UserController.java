@@ -1,16 +1,30 @@
 package com.ts.user.Controller;
 
 
-import com.netflix.discovery.converters.Auto;
-import com.ts.user.Model.User;
-import com.ts.user.Repository.UserRepository;
-import com.ts.user.Service.UserService;
+import com.auth0.client.auth.AuthAPI;
+import com.auth0.client.mgmt.ManagementAPI;
+import com.auth0.exception.APIException;
+import com.auth0.exception.Auth0Exception;
+import com.auth0.json.auth.UserInfo;
+import com.auth0.json.mgmt.users.User;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.net.Request;
+import com.auth0.spring.security.api.authentication.AuthenticationJsonWebToken;
+import com.auth0.spring.security.api.authentication.JwtAuthentication;
+import com.ts.user.Model.ApplicationUser;
+import com.ts.user.Repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,17 +33,54 @@ import java.util.Optional;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private ApplicationUserRepository applicationUserRepository;
+
+    @Autowired
+    private ManagementAPI managementAPI;
+
+    @PostMapping("/sign-up")
+    public void signUp(@RequestBody ApplicationUser applicationUser) {
+        applicationUserRepository.save(applicationUser);
+    }
+
+    void checkUser(String username) {
+        // checks if user exists in database
+        // if user doesnt exist, fetches user info from Auth0 and creates user in database
+        ApplicationUser user = applicationUserRepository.findByUsername(username);
+        if (user == null) {
+            Request<User> userDetailsRequest = managementAPI.users().get(username, null);
+            try {
+                User userDetails = userDetailsRequest.execute();
+                ApplicationUser newUser = new ApplicationUser();
+                newUser.setUsername(username);
+                newUser.setName(userDetails.getName());
+                newUser.setEmail(userDetails.getEmail());
+                applicationUserRepository.save(newUser);
+            } catch (APIException exception) {
+                // api error
+            } catch (Auth0Exception exception) {
+                // request error
+            }
+        }
+    }
 
     //TESTING PURPOSES
     @GetMapping("/")
-    Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    ApplicationUser currentUser(Authentication auth, Principal principal) {
+        System.out.println(principal.getName());
+
+        DecodedJWT details = (DecodedJWT) auth.getDetails();
+
+        String accessToken = details.getToken();
+
+        checkUser(principal.getName());
+
+        return applicationUserRepository.findByUsername(principal.getName());
     }
 
     @GetMapping("/{id}")
-    public @ResponseBody ResponseEntity getUser(@PathVariable Long id) {
-        Optional<User> user = userRepository.findById(id);
+    public @ResponseBody ResponseEntity getUser(Principal principal, @PathVariable Long id) {
+        Optional<ApplicationUser> user = applicationUserRepository.findById(id);
         if (!user.isPresent()) {
             return ResponseEntity.notFound().build();
         }
@@ -39,37 +90,37 @@ public class UserController {
     }
 
     @PostMapping(path = "/add", headers = "Content-Type=application/json")
-    public ResponseEntity addNewUser(@RequestBody User user) {
+    public ResponseEntity addNewUser(@RequestBody ApplicationUser applicationUser) {
 
-        userRepository.save(user);
+        applicationUserRepository.save(applicationUser);
 
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(applicationUser, HttpStatus.CREATED);
     }
 
     @PostMapping("/add")
     public ResponseEntity addNewUser(@RequestParam String name, @RequestParam String designation, @RequestParam String office) {
 
-        User user = new User();
-        user.setName(name);
-        user.setDesignation(designation);
-        user.setOffice(office);
-        userRepository.save(user);
+        ApplicationUser applicationUser = new ApplicationUser();
+//        applicationUser.setName(name);
+//        applicationUser.setDesignation(designation);
+//        applicationUser.setOffice(office);
+        applicationUserRepository.save(applicationUser);
 
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(applicationUser, HttpStatus.CREATED);
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity editUser(@PathVariable long id, @RequestBody User user) {
+    public ResponseEntity editUser(@PathVariable long id, @RequestBody ApplicationUser applicationUser) {
 
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<ApplicationUser> userOptional = applicationUserRepository.findById(id);
         if (!userOptional.isPresent())
             return ResponseEntity.notFound().build();
 
-        user.setId(id);
+        applicationUser.setId(id);
 
-        userRepository.save(user);
+        applicationUserRepository.save(applicationUser);
 
-        return new ResponseEntity("Updated User @{" + id + "} successfully", HttpStatus.OK);
+        return new ResponseEntity("Updated ApplicationUser @{" + id + "} successfully", HttpStatus.OK);
     }
 
     
