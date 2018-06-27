@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ts</groupId>
-    <artifactId>applicationUser-service</artifactId>
+    <artifactId>user-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>applicationUser-service</name>
+    <name>user-service</name>
     <description>User microservice for Grizzly Store</description>
 
     <parent>
@@ -130,7 +130,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>applicationUser-service</finalName>
+        <finalName>user-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
