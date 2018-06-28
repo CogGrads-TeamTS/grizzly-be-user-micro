@@ -47,14 +47,19 @@ public class UserController {
 
     //TESTING PURPOSES
     @GetMapping("/")
-    ApplicationUser currentUser(Authentication auth, Principal principal) {
+    ResponseEntity currentUser(Authentication auth, Principal principal) {
         //System.out.println(principal.getName());
 
-        DecodedJWT details = (DecodedJWT) auth.getDetails();
+        // DecodedJWT details = (DecodedJWT) auth.getDetails();
+        // String accessToken = details.getToken();
 
-        String accessToken = details.getToken();
-
-        return applicationUserRepository.findByUsername(principal.getName());
+        Optional<ApplicationUser> user = applicationUserRepository.findByUsername(principal.getName());
+        if (!user.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
     }
 
     @GetMapping("/{id}")

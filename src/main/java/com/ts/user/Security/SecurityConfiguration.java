@@ -23,7 +23,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .configure(http)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/").hasAuthority("read:users")
-                .antMatchers(HttpMethod.GET, "/{id}").hasAuthority("read:users")
+                .antMatchers(HttpMethod.GET, "/{id}").permitAll()
                 .anyRequest().authenticated();
     }
 }
