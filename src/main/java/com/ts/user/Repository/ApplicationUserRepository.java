@@ -9,5 +9,5 @@ import java.util.Optional;
 
 
 public interface ApplicationUserRepository extends CrudRepository<ApplicationUser, Long>, JpaRepository<ApplicationUser, Long>, PagingAndSortingRepository<ApplicationUser, Long> {
-    Optional<ApplicationUser> findByUsername(String username);
+    ApplicationUser findByUsername(String username);
 }

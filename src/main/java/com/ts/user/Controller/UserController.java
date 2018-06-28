@@ -53,13 +53,11 @@ public class UserController {
         // DecodedJWT details = (DecodedJWT) auth.getDetails();
         // String accessToken = details.getToken();
 
-        Optional<ApplicationUser> user = applicationUserRepository.findByUsername(principal.getName());
-        if (!user.isPresent()) {
+        ApplicationUser user = applicationUserRepository.findByUsername(principal.getName());
+        if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        else {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -68,9 +66,7 @@ public class UserController {
         if (!user.isPresent()) {
             return ResponseEntity.notFound().build();
         }
-        else {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping(path = "/add", headers = "Content-Type=application/json")
