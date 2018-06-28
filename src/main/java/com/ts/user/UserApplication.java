@@ -51,6 +51,8 @@ public class UserApplication {
     @Bean
     @Scope(value = "prototype")
     ManagementAPI managementAPI() {
+        // management token expires every 24 hours, bean set as prototype for now so token is refreshed each time this bean is called
+        // TODO: logic to only refresh token once the 24 hours is up?
         // get management token
         AuthRequest request = authenticationAPIClient().requestToken(audience);
         try {

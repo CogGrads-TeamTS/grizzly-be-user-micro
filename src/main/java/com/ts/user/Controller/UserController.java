@@ -43,39 +43,23 @@ public class UserController {
         applicationUserRepository.save(applicationUser);
     }
 
-    void checkUser(String username) {
-        // checks if user exists in database
-        // if user doesnt exist, fetches user info from Auth0 and creates user in database
-        ApplicationUser user = applicationUserRepository.findByUsername(username);
-        if (user == null) {
-            Request<User> userDetailsRequest = managementAPI.users().get(username, null);
-            try {
-                User userDetails = userDetailsRequest.execute();
-                ApplicationUser newUser = new ApplicationUser();
-                newUser.setUsername(username);
-                newUser.setName(userDetails.getName());
-                newUser.setEmail(userDetails.getEmail());
-                applicationUserRepository.save(newUser);
-            } catch (APIException exception) {
-                // api error
-            } catch (Auth0Exception exception) {
-                // request error
-            }
-        }
-    }
+
 
     //TESTING PURPOSES
     @GetMapping("/")
-    ApplicationUser currentUser(Authentication auth, Principal principal) {
-        System.out.println(principal.getName());
+    ResponseEntity currentUser(Authentication auth, Principal principal) {
+        //System.out.println(principal.getName());
 
-        DecodedJWT details = (DecodedJWT) auth.getDetails();
+        // DecodedJWT details = (DecodedJWT) auth.getDetails();
+        // String accessToken = details.getToken();
 
-        String accessToken = details.getToken();
-
-        checkUser(principal.getName());
-
-        return applicationUserRepository.findByUsername(principal.getName());
+        Optional<ApplicationUser> user = applicationUserRepository.findByUsername(principal.getName());
+        if (!user.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
     }
 
     @GetMapping("/{id}")
