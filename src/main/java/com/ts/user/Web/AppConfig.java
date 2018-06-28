@@ -15,7 +15,7 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // intercepts all routes.
-        registry.addInterceptor(newUserInterceptor());
+        // intercepts routes.
+        registry.addInterceptor(newUserInterceptor()).addPathPatterns("/");
     }
 }
