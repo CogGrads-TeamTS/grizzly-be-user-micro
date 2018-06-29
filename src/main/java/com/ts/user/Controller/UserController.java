@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(allowedHeaders = "Authorization")
 public class UserController {
 
     @Autowired
@@ -43,7 +43,18 @@ public class UserController {
         applicationUserRepository.save(applicationUser);
     }
 
+    @GetMapping("/current")
 
+    ResponseEntity current(Authentication auth, Principal principal) {
+        //System.out.println(principal.getName());
+
+        DecodedJWT details = (DecodedJWT) auth.getDetails();
+        String accessToken = details.getToken();
+
+        System.out.println(auth.getAuthorities());
+
+        return new ResponseEntity<>(auth, HttpStatus.OK);
+    }
 
     //TESTING PURPOSES
     @GetMapping("/")
