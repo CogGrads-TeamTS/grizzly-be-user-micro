@@ -25,7 +25,10 @@ public class NewUserInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        checkNewUser(request.getUserPrincipal().getName());
+
+        if(!request.getMethod().equalsIgnoreCase("options")) {
+            checkNewUser(request.getUserPrincipal().getName());
+        }
         return super.preHandle(request, response, handler);
     }
 
