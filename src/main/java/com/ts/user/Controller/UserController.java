@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(allowedHeaders = "Authorization")
+@CrossOrigin(origins = "*")
 public class UserController {
 
     @Autowired
