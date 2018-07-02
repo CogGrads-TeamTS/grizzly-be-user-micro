@@ -8,6 +8,7 @@ import com.auth0.net.Request;
 import com.ts.user.Model.ApplicationUser;
 import com.ts.user.Repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
