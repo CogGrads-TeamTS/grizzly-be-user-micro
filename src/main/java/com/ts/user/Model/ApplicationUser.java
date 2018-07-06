@@ -17,6 +17,26 @@ public class ApplicationUser {
     private String email;
     private String name;
 
+    private String designation;
+
+    private String office;
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+
+    public String getOffice() {
+        return office;
+    }
+
+    public void setOffice(String office) {
+        this.office = office;
+    }
+
     public String getEmail() {
         return email;
     }
